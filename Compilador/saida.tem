@@ -1,0 +1,33 @@
+(TIPO,inteiro) (ID,idade) 
+(ID,idade) (ATR,<-) (NUMINT,18) 
+(SE,se) (ID,idade) (LOGMAIORIGUAL,>=) (NUMINT,18) (ENTAO,então) 
+(ESCREVA,escreva) (PARAB,() (STRING,"Maior de idade") (PARFE,)) 
+(SENAO,senão) 
+(ESCREVA,escreva) (PARAB,() (STRING,"Menor de idade") (PARFE,)) 
+(FIMSE,fim_se) 
+
+
+
+(TIPO,inteiro) (ID,idade) 
+(TIPO,inteiro) (ID,i) 
+(STRING,string) (ID,nome) 
+
+(LEIA,leia) (PARAB,() (ID,nome) (PARFE,)) 
+(LEIA,leia) (PARAB,() (ID,idade) (PARFE,)) 
+
+(SE,se) (ID,idade) (LOGMAIORIGUAL,>=) (NUMINT,18) (ENTAO,então) 
+(ESCREVA,escreva) (PARAB,() (STRING,"Maior de idade") (PARFE,)) 
+(SENAO,senão) 
+(ESCREVA,escreva) (PARAB,() (STRING,"Menor de idade") (PARFE,)) 
+(FIMSE,fim_se) 
+
+(PARA,para) (ID,i) (ATR,<-) (NUMINT,1) (ATE,até) (NUMINT,5) (PASSO,passo) (NUMINT,1) 
+(ESCREVA,escreva) (PARAB,() (STRING,"Repetição número ") (PARFE,)) 
+(ESCREVA,escreva) (PARAB,() (ID,i) (PARFE,)) 
+(FIMPARA,fim_para) 
+
+(SE,se) (ID,idade) (LOGDIFF,<>) (NUMINT,0) (E,e) (ID,idade) (LOGMENORIGUAL,<=) (NUMINT,150) (ENTAO,então) 
+(ESCREVA,escreva) (PARAB,() (STRING,"Idade válida") (PARFE,)) 
+(SENAO,senão) 
+(ESCREVA,escreva) (PARAB,() (STRING,"Idade inválida") (PARFE,)) 
+(FIMSE,fim_se) 
