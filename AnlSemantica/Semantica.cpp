@@ -29,8 +29,8 @@ void log_erro(ofstream& log, const string& mensagem) {
 }
 
 int main() {
-    ifstream entrada("C:\\Users\\virov\\OneDrive\\Documentos\\Programadas\\C++\\Compilador\\Compilador\\saida.tem");
-    ofstream log("erros_semanticos.log");
+    ifstream entrada("../processamento/lexica.tem");
+    ofstream log("../processamento/erros_semanticos.log");
 
     if (!entrada.is_open()) {
         cerr << "Erro ao abrir arquivo de linguagem sintética!" << endl;

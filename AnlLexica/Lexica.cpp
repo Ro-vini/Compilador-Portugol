@@ -151,9 +151,9 @@ string classificar_token(const string& lexema) {
 }
 
 int main() {
-    ifstream entrada("programa.por");
-    ofstream saida("saida.tem");
-    ofstream saida_token("saida_token.tem");
+    ifstream entrada("../processamento/programa.por");
+    ofstream saida("../processamento/lexica.tem");
+    ofstream saida_token("../processamento/tabela.tem");
 
     if (!entrada.is_open() || !saida.is_open() || !saida_token.is_open()) {
         cerr << "Erro ao abrir arquivos!" << endl;
