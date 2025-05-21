@@ -7,12 +7,12 @@
 
 using namespace std;
 
-// Lista de tokens fixos em ordem de inser√ß√£o
+// Lista de tokens fixos em ordem de inserÁ„o
 vector<pair<string, string>> tokens_ordem = {
-    {"at√©", "ATE"},
+    {"atÈ", "ATE"},
     {"<-", "ATR"},
     {"e", "E"},
-    {"ent√£o", "ENTAO"},
+    {"ent„o", "ENTAO"},
     {"escreva", "ESCREVA"},
     {"fim_para", "FIMPARA"},
     {"fim_se", "FIMSE"},
@@ -23,7 +23,7 @@ vector<pair<string, string>> tokens_ordem = {
     {">=", "LOGMAIORIGUAL"},
     {"<", "LOGMENOR"},
     {"<=", "LOGMENORIGUAL"},
-    {"n√£o", "NAO"},
+    {"n„o", "NAO"},
     {"/", "OPDIVI"},
     {"+", "OPMAIS"},
     {"-", "OPMENOS"},
@@ -34,15 +34,15 @@ vector<pair<string, string>> tokens_ordem = {
     {")", "PARFE"},
     {"passo", "PASSO"},
     {"se", "SE"},
-    {"sen√£o", "SENAO"},
+    {"sen„o", "SENAO"},
     {"string", "STRING"},
     {"inteiro", "TIPO"},
 };
 
-// Mapa auxiliar para busca r√°pida
+// Mapa auxiliar para busca r·pida
 map<string, string> mapa_tokens;
 
-// Verifica se √© um n√∫mero inteiro
+// Verifica se È um n˙mero inteiro
 bool eh_inteiro(const string& s) {
     for (char c : s) {
         if (c < '0' || c > '9') return false;
@@ -50,12 +50,12 @@ bool eh_inteiro(const string& s) {
     return !s.empty();
 }
 
-// Verifica se √© uma string entre aspas
+// Verifica se È uma string entre aspas
 bool eh_string(const string& s) {
     return s.length() >= 2 && s.front() == '"' && s.back() == '"';
 }
 
-// Verifica se √© um identificador v√°lido
+// Verifica se È um identificador v·lido
 bool eh_identificador_valido(const string& s) {
     if (s.empty()) return false;
     if (!isalpha(static_cast<unsigned char>(s[0]))) return false;
@@ -121,7 +121,7 @@ vector<string> separar_lexemas(const string& linha) {
             continue;
         }
 
-        // espa√ßos
+        // espaÁos
         if (isspace(static_cast<unsigned char>(c))) {
             if (!palavra.empty()) {
                 resultado.push_back(palavra);
@@ -152,10 +152,9 @@ string classificar_token(const string& lexema) {
 
 int main() {
     ifstream entrada("../processamento/programa.por");
-    ofstream saida("../processamento/lexica.tem");
-    ofstream saida_token("../processamento/tabela.tem");
+    ofstream saida("../processamento/sintatica.tem");
 
-    if (!entrada.is_open() || !saida.is_open() || !saida_token.is_open()) {
+    if (!entrada.is_open() || !saida.is_open()) {
         cerr << "Erro ao abrir arquivos!" << endl;
         return 1;
     }
@@ -165,7 +164,7 @@ int main() {
         mapa_tokens[par.first] = par.second;
     }
 
-    set<string> tokens_ja_emitidos; // rastrear tokens j√° listados
+    set<string> tokens_ja_emitidos; // rastrear tokens j· listados
 
     string linha;
     while (getline(entrada, linha)) {
@@ -173,26 +172,16 @@ int main() {
         for (const string& lex : lexemas) {
             string token = classificar_token(lex);
 
-            // Emite forma lexica
-            saida << token << " ";
-
-            // Se for token fixo, emitir posi√ß√£o apenas uma vez
-            for (size_t i = 0; i < tokens_ordem.size(); ++i) {
-                if (tokens_ordem[i].first == lex && tokens_ja_emitidos.count(token) == 0) {
-                    saida_token << token << " -> posicao " << (i + 1) << "\n";
-                    tokens_ja_emitidos.insert(token);
-                    break;
-                }
-            }
+            // Emite forma sintatica
+            saida << "(" << token << "," << lex << ") ";
         }
         saida << "\n";
     }
 
     entrada.close();
     saida.close();
-    saida_token.close();
 
-    cout << "Analise lexica concluida. Veja os arquivos 'lexica.tem' e 'saida_token.tem'." << endl;
+    cout << "Analise sintatica concluida. Veja os arquivos 'sintatica.tem'." << endl;
 
     return 0;
 }

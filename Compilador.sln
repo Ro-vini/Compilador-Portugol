@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnlLexica", "AnlLexica\AnlL
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnlSemantica", "AnlSemantica\AnlSemantica.vcxproj", "{274A78F9-D4F2-41D2-8D0B-7CC12CF69238}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnlSintatica", "AnlSintatica\AnlSintatica.vcxproj", "{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{274A78F9-D4F2-41D2-8D0B-7CC12CF69238}.Release|x64.Build.0 = Release|x64
 		{274A78F9-D4F2-41D2-8D0B-7CC12CF69238}.Release|x86.ActiveCfg = Release|Win32
 		{274A78F9-D4F2-41D2-8D0B-7CC12CF69238}.Release|x86.Build.0 = Release|Win32
+		{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}.Debug|x64.ActiveCfg = Debug|x64
+		{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}.Debug|x64.Build.0 = Debug|x64
+		{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}.Debug|x86.ActiveCfg = Debug|Win32
+		{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}.Debug|x86.Build.0 = Debug|Win32
+		{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}.Release|x64.ActiveCfg = Release|x64
+		{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}.Release|x64.Build.0 = Release|x64
+		{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}.Release|x86.ActiveCfg = Release|Win32
+		{7CDAB2D7-9C03-430B-9C0C-CE30A9137854}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

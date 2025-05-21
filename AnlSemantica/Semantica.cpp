@@ -197,10 +197,10 @@ int main() {
     log.close();
 
     if (erro_encontrado) {
-        cout << "Análise semântica concluída com erros. Veja 'erros_semanticos.log'." << endl;
+        cout << "Analise semantica concluida com erros. Veja 'erros_semanticos.log'." << endl;
     }
     else {
-        cout << "Análise semântica concluída sem erros." << endl;
+        cout << "Analise semantica concluida sem erros." << endl;
     }
 
     return 0;
