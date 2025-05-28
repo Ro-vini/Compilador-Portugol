@@ -3,6 +3,6 @@
 (ID,soma) (LOGMENOR,<) (ID,idade) (OPMAIS,+) (OPMENOS,-) (OPDIVI,/) (NUMINT,5) 
 (ESCREVA,escreva) (PARAB,() (STRING,"Idade") (PARFE,)) 
 (LEIA,leia) (PARAB,() (NUMINT,10) (PARFE,)) (ERRO,;) 
-(SE,se) (ID,idade) (LOGMAIOR,>) (LOGMAIOR,>) (NUMINT,18) 
+(SE,se) (ID,idade) (LOGMAIOR,>) (NUMINT,18) 
 (ESCREVA,escreva) (PARAB,() (STRING,"Maior de idade") (PARFE,)) 
 (ID,fim) (SE,se) 

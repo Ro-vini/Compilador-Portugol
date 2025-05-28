@@ -49,6 +49,10 @@ int main() {
     int nivel_se = 0;
     int nivel_para = 0;
 
+    // Variaveis verificação conteudo dentro do SE
+    bool dentro_de_se = false;
+    bool comando_encontrado_no_se = false;
+
     while (getline(entrada, linha)) {
         numero_linha++;
 
@@ -123,6 +127,7 @@ int main() {
         // Atribuição
         // ------------------------------
         else if (tokens.size() >= 3 && tokens[1].first == "ATR") {
+            if (dentro_de_se) comando_encontrado_no_se = true;
             string id_alvo = tokens[0].second;
 
             // Verifica se variável alvo foi declarada
@@ -209,18 +214,27 @@ int main() {
         // ------------------------------
         // Comando leia
         // ------------------------------
-        else if (primeiro_token == "LEIA" && tokens.size() == 4 && tokens[1].first == "PARAB" && tokens[2].first == "ID") {
-            string nome = tokens[2].second;
-            if (!foi_declarado(nome)) {
-                log_erro(log, "Erro: Variavel '" + nome + "' usada em 'leia' sem declaracao.");
+        else if (primeiro_token == "LEIA") {
+            if (dentro_de_se) comando_encontrado_no_se = true;
+            if (tokens.size() == 4 && tokens[1].first == "PARAB" && tokens[2].first == "ID") {
+                string nome = tokens[2].second;
+                if (!foi_declarado(nome)) {
+                    log_erro(log, "Erro: Variavel '" + nome + "' usada em 'leia' sem declaracao.");
+                    erro_encontrado = true;
+                }
+            }
+            else {
+                log_erro(log, "Erro: Formato invalido no comando 'leia'. Esperado: leia(ID)");
                 erro_encontrado = true;
             }
         }
+
 
         // ------------------------------
         // Comando escreva
         // ------------------------------
         else if (primeiro_token == "ESCREVA" && tokens.size() >= 4 && tokens[1].first == "PARAB") {
+            if (dentro_de_se) comando_encontrado_no_se = true;
             string tipo = tokens[2].first;
             string valor = tokens[2].second;
 
@@ -239,7 +253,38 @@ int main() {
         // ------------------------------
         // Estruturas de controle
         // ------------------------------
-        else if (primeiro_token == "SE") nivel_se++;
+        else if (primeiro_token == "SE") {
+            nivel_se++;
+            dentro_de_se = true;
+            comando_encontrado_no_se = false;
+
+            if (tokens.size() != 4) {
+                log_erro(log, "Erro: Condicao invalida no comando 'se'. Esperado: SE ID OPERADOR VALOR");
+                erro_encontrado = true;
+                continue;
+            }
+
+            string var = tokens[1].second;
+            string operador = tokens[2].first;
+            string valor = tokens[3].second;
+            string tipo_valor = tokens[3].first;
+
+            if (tokens[1].first != "ID" || !foi_declarado(var)) {
+                log_erro(log, "Erro: Variavel '" + var + "' usada em 'se' sem declaracao.");
+                erro_encontrado = true;
+            }
+
+            set<string> operadores_validos = { "LOGMAIOR", "LOGMENOR", "LOGIGUAL", "LOGDIF", "LOGMAIORIG", "LOGMENORIG" };
+            if (operadores_validos.count(operador) == 0) {
+                log_erro(log, "Erro: Operador logico invalido em 'se'.");
+                erro_encontrado = true;
+            }
+
+            if (tipo_valor != "NUMINT" && (tokens[3].first != "ID" || !foi_declarado(valor))) {
+                log_erro(log, "Erro: Valor da condicao em 'se' invalido ou nao declarado.");
+                erro_encontrado = true;
+            }
+        }
         else if (primeiro_token == "FIMSE") {
             if (nivel_se == 0) {
                 log_erro(log, "Erro: 'fim_se' sem 'se' correspondente.");
@@ -247,7 +292,12 @@ int main() {
             }
             else {
                 nivel_se--;
+                if (!comando_encontrado_no_se) {
+                    log_erro(log, "Erro: Bloco 'se' vazio. Nenhum comando encontrado entre 'se' e 'fim_se'.");
+                    erro_encontrado = true;
+                }
             }
+            dentro_de_se = false;
         }
         else if (primeiro_token == "PARA") nivel_para++;
         else if (primeiro_token == "FIMPARA") {
