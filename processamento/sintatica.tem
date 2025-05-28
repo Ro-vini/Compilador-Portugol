@@ -1,5 +1,6 @@
 (TIPO,inteiro) (ID,idade) 
-(ID,soma) (LOGIGUAL,=) (ID,idade) (OPMAIS,+) (NUMINT,5) 
+(ID,soma) (ATR,<-) (ID,idade) (OPMAIS,+) (OPMENOS,-) (OPDIVI,/) (NUMINT,5) 
+(ID,soma) (LOGMENOR,<) (ID,idade) (OPMAIS,+) (OPMENOS,-) (OPDIVI,/) (NUMINT,5) 
 (ESCREVA,escreva) (PARAB,() (STRING,"Idade") (PARFE,)) 
 (LEIA,leia) (PARAB,() (NUMINT,10) (PARFE,)) (ERRO,;) 
 (SE,se) (ID,idade) (LOGMAIOR,>) (LOGMAIOR,>) (NUMINT,18) 

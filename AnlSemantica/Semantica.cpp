@@ -23,6 +23,11 @@ bool foi_declarado(const string& id) {
     return variaveis_declaradas.count(id) > 0;
 }
 
+// Verifica se variável é do tipo inteiro
+bool eh_inteiro_declarado(const string& id) {
+    return foi_declarado(id) && variaveis_declaradas[id] == "inteiro";
+}
+
 // Grava erro no log com a linha correspondente
 void log_erro(ofstream& log, const string& mensagem) {
     log << "Linha " << numero_linha << ": " << mensagem << endl;
@@ -114,40 +119,91 @@ int main() {
             }
         }
 
-
         // ------------------------------
         // Atribuição
         // ------------------------------
         else if (tokens.size() >= 3 && tokens[1].first == "ATR") {
             string id_alvo = tokens[0].second;
 
-            // Verifica se Variavel foi declarada
+            // Verifica se variável alvo foi declarada
             if (!foi_declarado(id_alvo)) {
                 log_erro(log, "Erro: Variavel '" + id_alvo + "' usada antes de ser declarada.");
                 erro_encontrado = true;
             }
 
-            // Expressões válidas
+            // ID <- ID ou ID <- NUMINT
             if (tokens.size() == 3) {
-                if (tokens[2].first != "NUMINT" && (tokens[2].first != "ID" || !foi_declarado(tokens[2].second))) {
+                string tipo = tokens[2].first;
+                string valor = tokens[2].second;
+
+                if (tipo == "ID") {
+                    if (!eh_inteiro_declarado(valor)) {
+                        log_erro(log, "Erro: Variavel '" + valor + "' nao declarada ou nao eh inteiro.");
+                        erro_encontrado = true;
+                    }
+                }
+                else if (tipo == "NUMINT") {
+                    // valor literal sempre inteiro, OK
+                }
+                else {
                     log_erro(log, "Erro: Valor de atribuicao invalido.");
                     erro_encontrado = true;
                 }
             }
-            else if (tokens.size() == 5 && eh_operador_matematico(tokens[3].first)) {
-                string op1 = tokens[2].second;
-                string op2 = tokens[4].second;
 
-                if ((tokens[2].first == "ID" && !foi_declarado(op1)) ||
-                    (tokens[4].first == "ID" && !foi_declarado(op2))) {
-                    log_erro(log, "Erro: Operando nao declarado em expressao.");
+            // ID <- <NUMINT|ID> <OP> <NUMINT|ID>
+            else if (tokens.size() == 5) {
+                string tipo1 = tokens[2].first;
+                string valor1 = tokens[2].second;
+                string operador = tokens[3].first;
+                string tipo2 = tokens[4].first;
+                string valor2 = tokens[4].second;
+
+                if (!eh_operador_matematico(operador)) {
+                    log_erro(log, "Erro: Operador matematico invalido.");
+                    erro_encontrado = true;
+                }
+
+                // Operando 1
+                if (tipo1 == "ID") {
+                    if (!eh_inteiro_declarado(valor1)) {
+                        log_erro(log, "Erro: Variavel '" + valor1 + "' nao declarada ou nao eh inteiro.");
+                        erro_encontrado = true;
+                    }
+                }
+                else if (tipo1 != "NUMINT") {
+                    log_erro(log, "Erro: Operando 1 invalido.");
+                    erro_encontrado = true;
+                }
+
+                // Operando 2
+                if (tipo2 == "ID") {
+                    if (!eh_inteiro_declarado(valor2)) {
+                        log_erro(log, "Erro: Variavel '" + valor2 + "' nao declarada ou nao eh inteiro.");
+                        erro_encontrado = true;
+                    }
+                }
+                else if (tipo2 != "NUMINT") {
+                    log_erro(log, "Erro: Operando 2 invalido.");
                     erro_encontrado = true;
                 }
             }
+
+            // Demais formatos inválidos
             else {
                 log_erro(log, "Erro: Forma de atribuicao invalida.");
                 erro_encontrado = true;
             }
+        }
+        else if (tokens.size() >= 3 && tokens[1].first == "OPIGUAL") {
+            log_erro(log, "Erro: Atribuicao invalida. Use '<-' em vez de '='.");
+            erro_encontrado = true;
+            continue;
+}
+        else if (tokens[0].first == "ID" && tokens.size() > 1 && tokens[1].first != "ATR") {
+            log_erro(log, "Erro: Comando invalido ou fora de estrutura esperada (como SE).");
+            erro_encontrado = true;
+            continue;
         }
 
         // ------------------------------
@@ -168,9 +224,11 @@ int main() {
             string tipo = tokens[2].first;
             string valor = tokens[2].second;
 
-            if (tipo == "ID" && !foi_declarado(valor)) {
-                log_erro(log, "Erro: Variavel '" + valor + "' usada em 'escreva' sem declaracao.");
-                erro_encontrado = true;
+            if (tipo == "ID") {
+                if (!foi_declarado(valor)) {
+                    log_erro(log, "Erro: Variavel '" + valor + "' usada em 'escreva' sem declaracao.");
+                    erro_encontrado = true;
+                }
             }
             else if (tipo != "ID" && tipo != "STRING" && tipo != "NUMINT") {
                 log_erro(log, "Erro: Tipo invalida em 'escreva': " + tipo);
