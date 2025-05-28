@@ -11,6 +11,7 @@ using namespace std;
 vector<pair<string, string>> tokens_ordem = {
     {"até", "ATE"},
     {"<-", "ATR"},
+    {":", "DEC"},
     {"e", "E"},
     {"então", "ENTAO"},
     {"escreva", "ESCREVA"},
@@ -92,7 +93,7 @@ vector<string> separar_lexemas(const string& linha) {
         }
 
         // operadores de 1 caractere
-        if (string("()+-*/=<>").find(c) != string::npos) {
+        if (string("()+-*/=<>:").find(c) != string::npos) {
             if (!palavra.empty()) {
                 resultado.push_back(palavra);
                 palavra.clear();
@@ -151,7 +152,7 @@ string classificar_token(const string& lexema) {
 }
 
 int main() {
-    ifstream entrada("../processamento/programa.por");
+    ifstream entrada("../processamento/TESTE_COM_ERRO.por");
     ofstream saida("../processamento/lexica.tem");
     ofstream saida_token("../processamento/tabela.tem");
 

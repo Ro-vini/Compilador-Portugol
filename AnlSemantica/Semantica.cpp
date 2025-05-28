@@ -29,11 +29,11 @@ void log_erro(ofstream& log, const string& mensagem) {
 }
 
 int main() {
-    ifstream entrada("../processamento/lexica.tem");
+    ifstream entrada("../processamento/sintatica.tem");
     ofstream log("../processamento/erros_semanticos.log");
 
     if (!entrada.is_open()) {
-        cerr << "Erro ao abrir arquivo de linguagem sintética!" << endl;
+        cerr << "Erro ao abrir arquivo de linguagem sintatica!" << endl;
         return 1;
     }
 
@@ -73,27 +73,47 @@ int main() {
         string primeiro_token = tokens[0].first;
 
         // ------------------------------
-        // Declaração de variável
+        // Verifica se é uma tentativa de declaração
         // ------------------------------
-        if (primeiro_token == "TIPO" && tokens.size() >= 2 && tokens[1].first == "ID") {
-            string nome_var = tokens[1].second;
+        bool contem_tipo_ou_dec = false;
+        for (const auto& t : tokens) {
+            if (t.first == "TIPO" || t.first == "DEC") {
+                contem_tipo_ou_dec = true;
+                break;
+            }
+        }
 
-            // Só aceita tipo inteiro
-            if (tokens[0].second != "inteiro") {
-                log_erro(log, "Erro: Tipo '" + tokens[0].second + "' inválido. Apenas 'inteiro' é permitido.");
+        if (contem_tipo_ou_dec) {
+            if (tokens.size() == 3 &&
+                tokens[0].first == "TIPO" &&
+                tokens[1].first == "DEC" &&
+                tokens[2].first == "ID") {
+
+                string nome_var = tokens[2].second;
+
+                if (tokens[0].second != "inteiro") {
+                    log_erro(log, "Erro: Tipo '" + tokens[0].second + "' invalido. Apenas 'inteiro' eh permitido.");
+                    erro_encontrado = true;
+                    continue;
+                }
+
+                if (foi_declarado(nome_var)) {
+                    log_erro(log, "Erro: Variavel '" + nome_var + "' ja declarada.");
+                    erro_encontrado = true;
+                }
+                else {
+                    variaveis_declaradas[nome_var] = "inteiro";
+                }
+
+                continue; // não processa mais nada nesta linha
+            }
+            else {
+                log_erro(log, "Erro: Declaracao invalida. Formato esperado: TIPO DEC ID.");
                 erro_encontrado = true;
                 continue;
             }
-
-            // Verifica duplicação
-            if (foi_declarado(nome_var)) {
-                log_erro(log, "Erro: Variável '" + nome_var + "' já declarada.");
-                erro_encontrado = true;
-            }
-            else {
-                variaveis_declaradas[nome_var] = "inteiro";
-            }
         }
+
 
         // ------------------------------
         // Atribuição
@@ -101,16 +121,16 @@ int main() {
         else if (tokens.size() >= 3 && tokens[1].first == "ATR") {
             string id_alvo = tokens[0].second;
 
-            // Verifica se variável foi declarada
+            // Verifica se Variavel foi declarada
             if (!foi_declarado(id_alvo)) {
-                log_erro(log, "Erro: Variável '" + id_alvo + "' usada antes de ser declarada.");
+                log_erro(log, "Erro: Variavel '" + id_alvo + "' usada antes de ser declarada.");
                 erro_encontrado = true;
             }
 
             // Expressões válidas
             if (tokens.size() == 3) {
                 if (tokens[2].first != "NUMINT" && (tokens[2].first != "ID" || !foi_declarado(tokens[2].second))) {
-                    log_erro(log, "Erro: Valor de atribuição inválido.");
+                    log_erro(log, "Erro: Valor de atribuicao invalido.");
                     erro_encontrado = true;
                 }
             }
@@ -120,12 +140,12 @@ int main() {
 
                 if ((tokens[2].first == "ID" && !foi_declarado(op1)) ||
                     (tokens[4].first == "ID" && !foi_declarado(op2))) {
-                    log_erro(log, "Erro: Operando não declarado em expressão.");
+                    log_erro(log, "Erro: Operando nao declarado em expressao.");
                     erro_encontrado = true;
                 }
             }
             else {
-                log_erro(log, "Erro: Forma de atribuição inválida.");
+                log_erro(log, "Erro: Forma de atribuicao invalida.");
                 erro_encontrado = true;
             }
         }
@@ -136,7 +156,7 @@ int main() {
         else if (primeiro_token == "LEIA" && tokens.size() == 4 && tokens[1].first == "PARAB" && tokens[2].first == "ID") {
             string nome = tokens[2].second;
             if (!foi_declarado(nome)) {
-                log_erro(log, "Erro: Variável '" + nome + "' usada em 'leia' sem declaração.");
+                log_erro(log, "Erro: Variavel '" + nome + "' usada em 'leia' sem declaracao.");
                 erro_encontrado = true;
             }
         }
@@ -149,11 +169,11 @@ int main() {
             string valor = tokens[2].second;
 
             if (tipo == "ID" && !foi_declarado(valor)) {
-                log_erro(log, "Erro: Variável '" + valor + "' usada em 'escreva' sem declaração.");
+                log_erro(log, "Erro: Variavel '" + valor + "' usada em 'escreva' sem declaracao.");
                 erro_encontrado = true;
             }
             else if (tipo != "ID" && tipo != "STRING" && tipo != "NUMINT") {
-                log_erro(log, "Erro: Tipo inválido em 'escreva': " + tipo);
+                log_erro(log, "Erro: Tipo invalida em 'escreva': " + tipo);
                 erro_encontrado = true;
             }
         }
