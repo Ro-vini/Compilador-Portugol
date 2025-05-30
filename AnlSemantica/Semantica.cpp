@@ -9,6 +9,7 @@ using namespace std;
 
 // Tabela de variáveis declaradas: nome -> tipo
 map<string, string> variaveis_declaradas;
+set<string> variaveis_atribuidas;
 
 // Contador de linhas para log
 int numero_linha = 0;
@@ -26,6 +27,10 @@ bool foi_declarado(const string& id) {
 // Verifica se variável é do tipo inteiro
 bool eh_inteiro_declarado(const string& id) {
     return foi_declarado(id) && variaveis_declaradas[id] == "inteiro";
+}
+
+bool foi_atribuida(const string& id) {
+    return variaveis_atribuidas.count(id) > 0;
 }
 
 bool esta_na_linha(const vector<pair<string, string>>& tokens, const string& tipo_procurado) {
@@ -156,9 +161,13 @@ int main() {
                             log_erro(log, "Erro: Variavel '" + valor + "' nao declarada ou nao eh inteiro.");
                             erro_encontrado = true;
                         }
+                        else {
+                            variaveis_atribuidas.insert(id_alvo);
+						}
                     }
                     else if (tipo == "NUMINT") {
                         // valor literal sempre inteiro, OK
+						variaveis_atribuidas.insert(id_alvo);
                     }
                     else {
                         log_erro(log, "Erro: Valor de atribuicao invalido.");
@@ -174,9 +183,12 @@ int main() {
                     string tipo2 = tokens[4].first;
                     string valor2 = tokens[4].second;
 
+                    bool atribuicao_valida = true;
+
                     if (!eh_operador_matematico(operador)) {
                         log_erro(log, "Erro: Operador matematico invalido.");
                         erro_encontrado = true;
+                        atribuicao_valida = false;
                     }
 
                     // Operando 1
@@ -184,11 +196,18 @@ int main() {
                         if (!eh_inteiro_declarado(valor1)) {
                             log_erro(log, "Erro: Variavel '" + valor1 + "' nao declarada ou nao eh inteiro.");
                             erro_encontrado = true;
+                            atribuicao_valida = false;
+                        }
+                        else if (!foi_atribuida(valor1)) {
+                            log_erro(log, "Erro: Variavel '" + valor1 + "' usada sem valor atribuido.");
+                            erro_encontrado = true;
+                            atribuicao_valida = false;
                         }
                     }
                     else if (tipo1 != "NUMINT") {
                         log_erro(log, "Erro: Operando 1 invalido.");
                         erro_encontrado = true;
+                        atribuicao_valida = false;
                     }
 
                     // Operando 2
@@ -196,11 +215,23 @@ int main() {
                         if (!eh_inteiro_declarado(valor2)) {
                             log_erro(log, "Erro: Variavel '" + valor2 + "' nao declarada ou nao eh inteiro.");
                             erro_encontrado = true;
+                            atribuicao_valida = false;
+                        }
+                        else if (!foi_atribuida(valor2)) {
+                            log_erro(log, "Erro: Variavel '" + valor2 + "' usada sem valor atribuido.");
+                            erro_encontrado = true;
+                            atribuicao_valida = false;
                         }
                     }
                     else if (tipo2 != "NUMINT") {
                         log_erro(log, "Erro: Operando 2 invalido.");
                         erro_encontrado = true;
+                        atribuicao_valida = false;
+                    }
+
+                    // Marcar como atribuída apenas se tudo for válido
+                    if (atribuicao_valida) {
+                        variaveis_atribuidas.insert(id_alvo);
                     }
                 }
 
@@ -242,6 +273,8 @@ int main() {
                         log_erro(log, "Erro: Variavel '" + nome + "' usada em 'leia' sem declaracao.");
                         erro_encontrado = true;
                     }
+                    
+                    variaveis_atribuidas.insert(nome);
                 }
                 else {
                     log_erro(log, "Erro: Formato invalido no comando 'leia'. Esperado: leia(ID)");
@@ -270,6 +303,10 @@ int main() {
                 if (tipo == "ID") {
                     if (!foi_declarado(valor)) {
                         log_erro(log, "Erro: Variavel '" + valor + "' usada em 'escreva' sem declaracao.");
+                        erro_encontrado = true;
+                    }
+                    else if (!foi_atribuida(valor)) {
+                        log_erro(log, "Erro: Variavel '" + valor + "' usada em 'escreva' sem valor atribuido.");
                         erro_encontrado = true;
                     }
                 }
@@ -307,9 +344,15 @@ int main() {
             string tipo_valor = tokens[3].first;
 
             if (tokens[1].first == "ID" || tokens[1].first == "NUMINT") {
-                if (tokens[1].first == "ID" && !foi_declarado(var)) {
-                    log_erro(log, "Erro: Variavel '" + var + "' usada em 'se' sem declaracao.");
-                    erro_encontrado = true;
+                if (tokens[1].first == "ID") {
+                    if (!foi_declarado(var)) {
+                        log_erro(log, "Erro: Variavel '" + var + "' usada em 'se' sem declaracao.");
+                        erro_encontrado = true;
+                    }
+                    else if (!foi_atribuida(var)) {
+                        log_erro(log, "Erro: Variavel '" + var + "' usada em 'escreva' sem valor atribuido.");
+                        erro_encontrado = true;
+                    }
                 }
             } 
             else {
@@ -324,9 +367,15 @@ int main() {
             }
 
             if (tokens[3].first == "ID" || tokens[3].first == "NUMINT") {
-                if (tokens[1].first == "ID" && !foi_declarado(var)) {
-                    log_erro(log, "Erro: Variavel '" + var + "' usada em 'se' sem declaracao.");
-                    erro_encontrado = true;
+                if (tokens[3].first == "ID") {
+                    if (!foi_declarado(valor)) {
+                        log_erro(log, "Erro: Variavel '" + valor + "' usada em 'se' sem declaracao.");
+                        erro_encontrado = true;
+                    }
+                    else if (!foi_atribuida(valor)) {
+                        log_erro(log, "Erro: Variavel '" + valor + "' usada em 'escreva' sem valor atribuido.");
+                        erro_encontrado = true;
+                    }
                 }
             }
             else {
