@@ -152,7 +152,7 @@ string classificar_token(const string& lexema) {
 }
 
 int main() {
-    ifstream entrada("../processamento/TESTE_COM_ERRO.por");
+    ifstream entrada("../processamento/TESTE.por");
     ofstream saida("../processamento/lexica.tem");
     ofstream saida_token("../processamento/tabela.tem");
 

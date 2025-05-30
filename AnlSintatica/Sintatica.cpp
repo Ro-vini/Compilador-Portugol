@@ -7,13 +7,13 @@
 
 using namespace std;
 
-// Lista de tokens fixos em ordem de inserÁ„o
+// Lista de tokens fixos em ordem de inser√ß√£o
 vector<pair<string, string>> tokens_ordem = {
-    {"atÈ", "ATE"},
+    {"at√©", "ATE"},
     {"<-", "ATR"},
     {":", "DEC"},
     {"e", "E"},
-    {"ent„o", "ENTAO"},
+    {"ent√£o", "ENTAO"},
     {"escreva", "ESCREVA"},
     {"fim_para", "FIMPARA"},
     {"fim_se", "FIMSE"},
@@ -24,7 +24,7 @@ vector<pair<string, string>> tokens_ordem = {
     {">=", "LOGMAIORIGUAL"},
     {"<", "LOGMENOR"},
     {"<=", "LOGMENORIGUAL"},
-    {"n„o", "NAO"},
+    {"n√£o", "NAO"},
     {"/", "OPDIVI"},
     {"+", "OPMAIS"},
     {"-", "OPMENOS"},
@@ -35,15 +35,15 @@ vector<pair<string, string>> tokens_ordem = {
     {")", "PARFE"},
     {"passo", "PASSO"},
     {"se", "SE"},
-    {"sen„o", "SENAO"},
+    {"sen√£o", "SENAO"},
     {"string", "STRING"},
     {"inteiro", "TIPO"},
 };
 
-// Mapa auxiliar para busca r·pida
+// Mapa auxiliar para busca r√°pida
 map<string, string> mapa_tokens;
 
-// Verifica se È um n˙mero inteiro
+// Verifica se √© um n√∫mero inteiro
 bool eh_inteiro(const string& s) {
     for (char c : s) {
         if (c < '0' || c > '9') return false;
@@ -51,12 +51,12 @@ bool eh_inteiro(const string& s) {
     return !s.empty();
 }
 
-// Verifica se È uma string entre aspas
+// Verifica se √© uma string entre aspas
 bool eh_string(const string& s) {
     return s.length() >= 2 && s.front() == '"' && s.back() == '"';
 }
 
-// Verifica se È um identificador v·lido
+// Verifica se √© um identificador v√°lido
 bool eh_identificador_valido(const string& s) {
     if (s.empty()) return false;
     if (!isalpha(static_cast<unsigned char>(s[0]))) return false;
@@ -122,7 +122,7 @@ vector<string> separar_lexemas(const string& linha) {
             continue;
         }
 
-        // espaÁos
+        // espa√ßos
         if (isspace(static_cast<unsigned char>(c))) {
             if (!palavra.empty()) {
                 resultado.push_back(palavra);
@@ -152,7 +152,7 @@ string classificar_token(const string& lexema) {
 }
 
 int main() {
-    ifstream entrada("../processamento/TESTE_COM_ERRO.por");
+    ifstream entrada("../processamento/TESTE.por");
     ofstream saida("../processamento/sintatica.tem");
 
     if (!entrada.is_open() || !saida.is_open()) {
@@ -165,7 +165,7 @@ int main() {
         mapa_tokens[par.first] = par.second;
     }
 
-    set<string> tokens_ja_emitidos; // rastrear tokens j· listados
+    set<string> tokens_ja_emitidos; // rastrear tokens j√° listados
 
     string linha;
     while (getline(entrada, linha)) {
