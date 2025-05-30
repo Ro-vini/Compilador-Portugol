@@ -287,7 +287,7 @@ int main() {
         // ------------------------------
         // Estruturas de controle
         // ------------------------------
-        else if (esta_na_linha(tokens, "SE")) {
+        else if (esta_na_linha(tokens, "SE") || esta_na_linha(tokens, "ENTAO")) {
             nivel_se++;
             dentro_de_se = true;
             comando_encontrado_no_se = false;
@@ -382,9 +382,79 @@ int main() {
             dentro_de_senao = false;
             dentro_de_se = false;
         }
-        else if (esta_na_linha(tokens, "PARA")) {
+        else if (esta_na_linha(tokens, "PARA") || esta_na_linha(tokens, "ATE") || esta_na_linha(tokens, "PASSO")) {
+            if (primeiro_token != "PARA") {
+                log_erro(log, "Erro: Comando 'para' deve iniciar a linha.");
+                erro_encontrado = true;
+                continue;
+            }
+
+            if (tokens.size() != 4 && tokens.size() != 6) {
+                log_erro(log, "Erro: Formato invalido do comando 'para'. Esperado: PARA <ID|NUMINT> ATE <ID|NUMINT> [PASSO <ID|NUMINT>]");
+                erro_encontrado = true;
+                continue;
+            }
+
+            // Verificação do segundo token: ID ou NUMINT
+            string tipo1 = tokens[1].first;
+            string valor1 = tokens[1].second;
+
+            if (tipo1 == "ID") {
+                if (!eh_inteiro_declarado(valor1)) {
+                    log_erro(log, "Erro: Variavel '" + valor1 + "' nao declarada ou nao eh do tipo inteiro.");
+                    erro_encontrado = true;
+                }
+            }
+            else if (tipo1 != "NUMINT") {
+                log_erro(log, "Erro: Valor inicial do 'para' deve ser NUMINT ou ID.");
+                erro_encontrado = true;
+            }
+
+            // Verificação do terceiro token: ATE
+            if (tokens[2].first != "ATE") {
+                log_erro(log, "Erro: Palavra-chave 'ATE' esperada como terceiro elemento do comando 'para'.");
+                erro_encontrado = true;
+            }
+
+            // Verificação do quarto token: ID ou NUMINT
+            string tipo2 = tokens[3].first;
+            string valor2 = tokens[3].second;
+
+            if (tipo2 == "ID") {
+                if (!eh_inteiro_declarado(valor2)) {
+                    log_erro(log, "Erro: Variavel '" + valor2 + "' nao declarada ou nao eh do tipo inteiro.");
+                    erro_encontrado = true;
+                }
+            }
+            else if (tipo2 != "NUMINT") {
+                log_erro(log, "Erro: Valor final do 'para' deve ser NUMINT ou ID.");
+                erro_encontrado = true;
+            }
+
+            // Caso tokens.size() == 6, verificar PASSO
+            if (tokens.size() == 6) {
+                if (tokens[4].first != "PASSO") {
+                    log_erro(log, "Erro: Palavra-chave 'PASSO' esperada antes do valor de incremento.");
+                    erro_encontrado = true;
+                }
+
+                string tipo3 = tokens[5].first;
+                string valor3 = tokens[5].second;
+
+                if (tipo3 == "ID") {
+                    if (!eh_inteiro_declarado(valor3)) {
+                        log_erro(log, "Erro: Variavel '" + valor3 + "' usada no 'passo' nao declarada ou nao eh inteira.");
+                        erro_encontrado = true;
+                    }
+                }
+                else if (tipo3 != "NUMINT") {
+                    log_erro(log, "Erro: Valor do 'passo' deve ser NUMINT ou ID.");
+                    erro_encontrado = true;
+                }
+            }
+
             nivel_para++;
-			comando_encontrado_no_para = false;
+            comando_encontrado_no_para = false;
         }
         else if (esta_na_linha(tokens, "FIMPARA")) {
             if (primeiro_token != "FIMPARA" || tokens.size() != 1) {
@@ -397,14 +467,13 @@ int main() {
                 erro_encontrado = true;
             }
             else {
-                nivel_se--;
+                nivel_para--;
+
                 if (!comando_encontrado_no_para) {
                     log_erro(log, "Erro: Bloco 'para' vazio. Nenhum comando encontrado entre 'para' e 'fim_para'.");
                     erro_encontrado = true;
                 }
             }
-
-            dentro_de_se = false;
         }
     }
 
