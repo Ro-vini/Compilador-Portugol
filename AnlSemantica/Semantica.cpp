@@ -63,6 +63,10 @@ int main() {
     bool dentro_de_se = false;
     bool comando_encontrado_no_se = false;
 
+    bool dentro_de_senao = false;
+    bool senao_encontrado_no_se = false;
+    bool comando_encontrado_no_senao = false;
+
     while (getline(entrada, linha)) {
         numero_linha++;
 
@@ -131,7 +135,8 @@ int main() {
         else if (esta_na_linha(tokens, "ATR")) {
             if (tokens.size() >= 3 && tokens[1].first == "ATR") {
                 if (dentro_de_se) comando_encontrado_no_se = true;
-				if (nivel_para > 0) comando_encontrado_no_para = true;
+                if (dentro_de_senao) comando_encontrado_no_senao = true;
+                if (nivel_para > 0) comando_encontrado_no_para = true;
 
                 string id_alvo = tokens[0].second;
 
@@ -205,6 +210,11 @@ int main() {
                     erro_encontrado = true;
                 }
             }
+            else {
+                log_erro(log, "Erro: Atribuicao invalida. Esperado: ID <- <NUMINT|ID> ou ID <- <NUMINT|ID> <OP> <NUMINT|ID>.");
+                erro_encontrado = true;
+                continue;
+			}
         }
         else if (tokens.size() >= 3 && tokens[1].first == "OPIGUAL") {
             log_erro(log, "Erro: Atribuicao invalida. Use '<-' em vez de '='.");
@@ -223,6 +233,9 @@ int main() {
         else if (esta_na_linha(tokens, "LEIA")) {
             if (primeiro_token == "LEIA") {
                 if (dentro_de_se) comando_encontrado_no_se = true;
+                if (dentro_de_senao) comando_encontrado_no_senao = true;
+                if (nivel_para > 0) comando_encontrado_no_para = true;
+
                 if (tokens.size() == 4 && tokens[1].first == "PARAB" && tokens[2].first == "ID") {
                     string nome = tokens[2].second;
                     if (!foi_declarado(nome)) {
@@ -235,6 +248,10 @@ int main() {
                     erro_encontrado = true;
                 }
             }
+            else {
+                log_erro(log, "Erro: Comando 'leia' deve ser o primeiro token da linha.");
+                erro_encontrado = true;
+			}
         }
 
 
@@ -244,6 +261,9 @@ int main() {
 		else if (esta_na_linha(tokens, "ESCREVA")) {
             if (primeiro_token == "ESCREVA" && tokens.size() >= 4 && tokens[1].first == "PARAB") {
                 if (dentro_de_se) comando_encontrado_no_se = true;
+				if (dentro_de_senao) comando_encontrado_no_senao = true;
+				if (nivel_para > 0) comando_encontrado_no_para = true;
+
                 string tipo = tokens[2].first;
                 string valor = tokens[2].second;
 
@@ -258,6 +278,10 @@ int main() {
                     erro_encontrado = true;
                 }
             }
+            else {
+                log_erro(log, "Erro: Comando 'escreva' deve ser seguido por parenteses. Formato esperado: escreva(ID|NUMINT|STRING).");
+                erro_encontrado = true;
+			}
         }
 
         // ------------------------------
@@ -267,6 +291,9 @@ int main() {
             nivel_se++;
             dentro_de_se = true;
             comando_encontrado_no_se = false;
+
+            senao_encontrado_no_se = false;
+            comando_encontrado_no_senao = false;
 
             if (primeiro_token != "SE" || tokens.size() != 5 ) {
                 log_erro(log, "Erro: Condicao invalida no comando 'se'. Esperado: SE ID OPERADOR VALOR ENTAO");
@@ -312,6 +339,22 @@ int main() {
                 erro_encontrado = true;
             }
         }
+        else if (esta_na_linha(tokens, "SENAO")) {
+            if (primeiro_token != "SENAO" || tokens.size() != 1) {
+                log_erro(log, "Erro: 'senao' deve estar sozinho na linha.");
+                erro_encontrado = true;
+            }
+
+            if (!dentro_de_se || senao_encontrado_no_se) {
+                log_erro(log, "Erro: 'senao' inesperado. Verifique se esta dentro de um 'se' e nao repetido.");
+                erro_encontrado = true;
+            }
+            else {
+                senao_encontrado_no_se = true;
+                dentro_de_senao = true;
+                comando_encontrado_no_senao = false;
+            }
+        }
         else if (esta_na_linha(tokens, "FIMSE")) {
             if (primeiro_token != "FIMSE" || tokens.size() != 1) {
                 log_erro(log, "Erro: 'fim_se' deve ser sozinho na linha.");
@@ -324,12 +367,19 @@ int main() {
             }
             else {
                 nivel_se--;
-                if (!comando_encontrado_no_se) {
+
+                if (!comando_encontrado_no_se && !senao_encontrado_no_se) {
                     log_erro(log, "Erro: Bloco 'se' vazio. Nenhum comando encontrado entre 'se' e 'fim_se'.");
+                    erro_encontrado = true;
+                }
+
+                if (senao_encontrado_no_se && !comando_encontrado_no_senao) {
+                    log_erro(log, "Erro: Bloco 'senao' vazio. Nenhum comando encontrado entre 'senao' e 'fim_se'.");
                     erro_encontrado = true;
                 }
             }
 
+            dentro_de_senao = false;
             dentro_de_se = false;
         }
         else if (esta_na_linha(tokens, "PARA")) {
